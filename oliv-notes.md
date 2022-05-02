@@ -1,26 +1,26 @@
 ## Oliv scratch-pad
 
-First, compile it
+First, compile it (use proxy options if you're within a firewall)
 ```
-$ mvn -Dhttp.proxyHost=www-proxy.us.oracle.com -Dhttp.proxyPort=80 -Dhttps.proxyHost=www-proxy.us.oracle.com -Dhttps.proxyPort=80 compile
+$ mvn [-Dhttp.proxyHost=www-proxy.us.oracle.com -Dhttp.proxyPort=80 -Dhttps.proxyHost=www-proxy.us.oracle.com -Dhttps.proxyPort=80] compile
 ```
 
 package it
 ```
-$ mvn -Dhttp.proxyHost=www-proxy.us.oracle.com -Dhttp.proxyPort=80 -Dhttps.proxyHost=www-proxy.us.oracle.com -Dhttps.proxyPort=80 -Dmaven.test.skip=true package
+$ mvn [-Dhttp.proxyHost=www-proxy.us.oracle.com -Dhttp.proxyPort=80 -Dhttps.proxyHost=www-proxy.us.oracle.com -Dhttps.proxyPort=80] -Dmaven.test.skip=true package
 ```
 Requested resources should be in the `target` directory.
 
 Then:
 ```
 $ cd bmc-examples
-$ mvn -Dhttp.proxyHost=www-proxy.us.oracle.com -Dhttp.proxyPort=80 -Dhttps.proxyHost=www-proxy.us.oracle.com -Dhttps.proxyPort=80 -Dmaven.test.skip=true exec:java -Dexec.mainClass="RawRestCallExample"
+$ mvn [-Dhttp.proxyHost=www-proxy.us.oracle.com -Dhttp.proxyPort=80 -Dhttps.proxyHost=www-proxy.us.oracle.com -Dhttps.proxyPort=80] -Dmaven.test.skip=true exec:java -Dexec.mainClass="RawRestCallExample"
 ```
 
 Pure Java way (no REST):
 ```
 $ cd bmc-examples
-$ mvn -Dhttp.proxyHost=www-proxy.us.oracle.com -Dhttp.proxyPort=80 -Dhttps.proxyHost=www-proxy.us.oracle.com -Dhttps.proxyPort=80 -Dmaven.test.skip=true exec:java -Dexec.mainClass="ListWorkRequestsExample" -Dexec.args="ocid1.tenancy.oc1..aaaaaaaaxd6jemgcmdpb3pnctl7yf2hzswgi6g55gth7ioc2gbpbvqo5ecoa ocid1.instance.oc1.iad.abuwcljrnfre4xutla2jyep3yghuungzecbnigra7jzatfhzx7gb5dxxzlsq"
+$ mvn [-Dhttp.proxyHost=www-proxy.us.oracle.com -Dhttp.proxyPort=80 -Dhttps.proxyHost=www-proxy.us.oracle.com -Dhttps.proxyPort=80] -Dmaven.test.skip=true exec:java -Dexec.mainClass="ListWorkRequestsExample" -Dexec.args="ocid1.tenancy.oc1..aaaaaaaaxd6jemgcmdpb3pnctl7yf2hzswgi6g55gth7ioc2gbpbvqo5ecoa ocid1.instance.oc1.iad.abuwcljrnfre4xutla2jyep3yghuungzecbnigra7jzatfhzx7gb5dxxzlsq"
 ```
 
 ## Bulk notes, OCI & Co
