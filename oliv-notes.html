@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Oliv's Notes</title>
+	<link rel="stylesheet" href="stylesheet.css" type="text/css"/>
+</head>
+<body>
+<h2><a href="#oliv-scratch-pad" id="oliv-scratch-pad">Oliv scratch-pad</a></h2>
+<p>First, compile it</p>
+<pre><code>$ mvn -Dhttp.proxyHost=www-proxy.us.oracle.com -Dhttp.proxyPort=80 -Dhttps.proxyHost=www-proxy.us.oracle.com -Dhttps.proxyPort=80 compile
+</code></pre>
+<p>package it</p>
+<pre><code>$ mvn -Dhttp.proxyHost=www-proxy.us.oracle.com -Dhttp.proxyPort=80 -Dhttps.proxyHost=www-proxy.us.oracle.com -Dhttps.proxyPort=80 -Dmaven.test.skip=true package
+</code></pre>
+<p>Requested resources should be in the <code>target</code> directory.</p>
+<p>Then:</p>
+<pre><code>$ cd bmc-examples
+$ mvn -Dhttp.proxyHost=www-proxy.us.oracle.com -Dhttp.proxyPortstylesheet.css=80 -Dhttps.proxyHost=www-proxy.us.oracle.com -Dhttps.proxyPort=80 -Dmaven.test.skip=true exec:java -Dexec.mainClass=&quot;RawRestCallExample&quot;
+</code></pre>
+<p>Pure Java way (no REST):</p>
+<pre><code>$ cd bmc-examples
+$ mvn -Dhttp.proxyHost=www-proxy.us.oracle.com -Dhttp.proxyPort=80 -Dhttps.proxyHost=www-proxy.us.oracle.com -Dhttps.proxyPort=80 -Dmaven.test.skip=true exec:java -Dexec.mainClass=&quot;ListWorkRequestsExample&quot; -Dexec.args=&quot;ocid1.tenancy.oc1..aaaaaaaaxd6jemgcmdpb3pnctl7yf2hzswgi6g55gth7ioc2gbpbvqo5ecoa ocid1.instance.oc1.iad.abuwcljrnfre4xutla2jyep3yghuungzecbnigra7jzatfhzx7gb5dxxzlsq&quot;
+</code></pre>
+<h2><a href="#bulk-notes-oci--co" id="bulk-notes-oci--co">Bulk notes, oci &amp; Co</a></h2>
+<p>Console:</p>
+<ul>
+	<li><a href="https://console.us-ashburn-1.oraclecloud.com/">https://console.us-ashburn-1.oraclecloud.com/</a></li>
+	<li>Tenant: ocipaas1, paasdevoic</li>
+</ul>
+<p>To read, about the CLI:</p>
+<ul>
+	<li>Install CLI SDK: <a href="https://docs.cloud.oracle.com/iaas/Content/API/SDKDocs/cliinstall.htm">https://docs.cloud.oracle.com/iaas/Content/API/SDKDocs/cliinstall.htm</a></li>
+	<li>CLI: <a href="https://docs.cloud.oracle.com/iaas/Content/API/Concepts/cliconcepts.htm">https://docs.cloud.oracle.com/iaas/Content/API/Concepts/cliconcepts.htm</a></li>
+</ul>
+<p>To get your Token &amp; Co:</p>
+<ul>
+	<li>Token-based-Authentication for the CLI: <a href="https://docs.cloud.oracle.com/iaas/Content/API/SDKDocs/clitoken.htm">https://docs.cloud.oracle.com/iaas/Content/API/SDKDocs/clitoken.htm</a></li>
+</ul>
+<p>Create your local credentials:</p>
+<pre><code>$ oci session authenticate
+$ oci iam region list --config-file ~/.oci/config --profile oliv-profile --auth security_token
+</code></pre>
+<p>In the above, <code>oliv-profile</code> is provided by <strong>you</strong> during the process.
+	FYI, most of - if not all - the examples here use <code>DEFAULT</code> instead.</p>
+<p>Your credentials have a default TTL (Time To Live) of 60 minutes.</p>
+<p>Sometime I have an error saying</p>
+<pre><code>UnboundLocalError: local variable 'profile_name' referenced before assignment
+</code></pre>
+<p>I did</p>
+<pre><code>$ rm -rf ~/.oci/sessions
+$ rm ~/.oci/config
+</code></pre>
+<p>And run <code>oci session authenticate</code> again, successfully after that.</p>
+<p>It generates a set of keys under <code>~/.oci/sessions/DEFAULT</code> (<code>DEFAULT</code> being the name of the profile), you need to update your user profile with the public key,
+	in the OCI Web console.</p>
+<p>Example:</p>
+<pre><code>[DEFAULT]
+user=ocid1.user.oc1..aaaaaaaa7xtgzt2s3govzqpmjd7n2g6o5ladgresnoxdsvxaedkldge7wxoq
+fingerprint=53:0f:db:88:43:8a:a0:78:1e:46:50:fc:65:7f:fc:3f
+key_file=/Users/olediour/.oci/sessions/DEFAULT/oci_api_key.pem
+tenancy=ocid1.tenancy.oc1..aaaaaaaaxd6jemgcmdpb3pnctl7yf2hzswgi6g55gth7ioc2gbpbvqo5ecoa
+region=us-ashburn-1
+security_token_file=/Users/olediour/.oci/sessions/DEFAULT/token
+</code></pre>
+<blockquote>
+	<p>Note : I've had to add the <code>user</code> by hand.</p>
+</blockquote>
+<pre><code>oci iam region list --config-file /Users/olediour/.oci/config --profile DEFAULT --auth security_token
+</code></pre>
+<p>works without the user, but Java examples would not. Why?</p>
+<p>Find OCIDs, tenant and user:</p>
+<p><a href="https://docs.cloud.oracle.com/iaas/Content/GSG/Tasks/gettingstartedwiththeCLI.htm">https://docs.cloud.oracle.com/iaas/Content/GSG/Tasks/gettingstartedwiththeCLI.htm</a></p>
+<pre><code>$ export T=ocid1.tenancy.oc1..aaaaaaaaxd6jemgcmdpb3pnctl7yf2hzswgi6g55gth7ioc2gbpbvqo5ecoa
+$ oci iam compartment list -c $T --config-file ~/.oci/config --profile oliv-profile --auth security_token
+</code></pre>
+<pre><code>$ oci iam policy list --compartment-id ocid1.tenancy.oc1..aaaaaaaaxd6jemgcmdpb3pnctl7yf2hzswgi6g55gth7ioc2gbpbvqo5ecoa
+</code></pre>
+<p>SDKs, and git repos:</p>
+<ul>
+	<li><a href="https://docs.cloud.oracle.com/iaas/Content/API/Concepts/sdks.htm">https://docs.cloud.oracle.com/iaas/Content/API/Concepts/sdks.htm</a></li>
+	<li>Git Repo (CLI, in Python): <a href="https://github.com/oracle/oci-cli">https://github.com/oracle/oci-cli</a></li>
+	<li>Java SDK last release: <a href="https://github.com/oracle/oci-java-sdk/releases/tag/v1.5.9">https://github.com/oracle/oci-java-sdk/releases/tag/v1.5.9</a></li>
+	<li>Java SDK doc: <a href="https://docs.cloud.oracle.com/iaas/Content/API/SDKDocs/javasdk.htm">https://docs.cloud.oracle.com/iaas/Content/API/SDKDocs/javasdk.htm</a></li>
+</ul>
+<h3><a href="#configuring-credentials" id="configuring-credentials">Configuring Credentials</a></h3>
+<p><a href="https://docs.cloud.oracle.com/iaas/Content/API/SDKDocs/javasdkgettingstarted.htm#ConfigCreds">https://docs.cloud.oracle.com/iaas/Content/API/SDKDocs/javasdkgettingstarted.htm#ConfigCreds</a>
+	which in turn refers to <a href="https://docs.cloud.oracle.com/iaas/Content/API/Concepts/sdkconfig.htm">https://docs.cloud.oracle.com/iaas/Content/API/Concepts/sdkconfig.htm</a>.</p>
+<h3><a href="#required-keys-and-ocids" id="required-keys-and-ocids">Required Keys and OCIDs</a></h3>
+<p><a href="https://docs.cloud.oracle.com/iaas/Content/API/Concepts/apisigningkey.htm#Other">https://docs.cloud.oracle.com/iaas/Content/API/Concepts/apisigningkey.htm#Other</a></p>
+
+
+</body>
+</html>
